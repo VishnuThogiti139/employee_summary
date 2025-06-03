@@ -1,10 +1,11 @@
-import os
-from dotenv import load_dotenv
+import streamlit as st
 
-load_dotenv()
+DB_CONFIG = {
+    "host": st.secrets["MYSQL_HOST"],
+    "port": int(st.secrets["MYSQL_USER"]),
+    "user": st.secrets["DB_USER"],
+    "password": st.secrets["MYSQL_PASSWORD"],
+    "database": st.secrets["MYSQL_DB"]
+}
 
-MYSQL_HOST = os.getenv('MYSQL_HOST')
-MYSQL_USER = os.getenv('MYSQL_USER')
-MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
-MYSQL_DB = os.getenv('MYSQL_DB')
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
