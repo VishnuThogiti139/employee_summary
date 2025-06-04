@@ -1,30 +1,36 @@
-from utils.ai_helper import call_gemini
+def generate_sql_prompt(user_prompt):
+    return f"""
+You are an expert MySQL assistant. Write a SQL SELECT query based on this natural language request:
+\"\"\"{user_prompt}\"\"\"
 
-def generate_sql_from_prompt(user_input):
-    prompt = f"""
-    You are an expert SQL generator. Given a natural language request by user, produce a MySQL SELECT query against the 'employees' table that best matches the request. 
-    Only output the SQL query, no explanations.
+Always include these fields in the SELECT clause:
+- e.id
+- e.first_name
+- e.last_name
+- ec.phone
+- ec.email
+- ec.location
+- ec.social_links
+- ee.education
+- ep.about_self
+- ep.hobbies
+- ep.username
+- ep.password
+- ex.experience
+- e.age
+- e.sex
+- e.married
 
-    employee table has these columns : first_name, last_name, age, sex, married, location, phone, email,
-        education, social_links, about_self, experience, hobbies, username, password
-
-    Request: "{user_input}"
-    """
-    sql = call_gemini(prompt).strip("```")
-    # ... validate and return
-
-    sql = sql.strip('sql\n')
-    print("🧠 Gemini raw output:", repr(sql))  # Use repr to see hidden chars
-
-    # print("", repr(sql.strip('\n')))
-
-    if ";" in sql:
-        sql = sql.split(";")[0].strip() + ";"
-
-    print("final sql query : " , repr(sql))
-
-    if not sql.lower().startswith("select") or "employees" not in sql.lower():
-        print("❌ Invalid SQL — using fallback.")
-        return "SELECT * FROM employees;"
-
-    return sql
+Use appropriate JOINs between:
+- employees (alias: e)
+- employee_contact (alias: ec)
+- employee_education (alias: ee)
+- employee_experience (alias: ex)
+- employee_profile (alias: ep)
+"""
+def clean_sql_query(sql_text: str) -> str:
+    sql_text = sql_text.strip()
+    if sql_text.startswith("```sql"):
+        sql_text = sql_text.replace("```sql", "").strip()
+    sql_text = sql_text.replace("```", "").strip()
+    return sql_text
