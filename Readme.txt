@@ -1,39 +1,143 @@
-"I built a full-stack Python web application that collects employee data, stores it in a MySQL database, and uses Google’s Gemini AI to generate human-like summaries and SQL queries based on user input."
+AI-Powered Employee Summary App
+A modular, extensible Streamlit-based web application to manage employee data, generate intelligent summaries using AI (Gemini, OpenAI, or DeepSeek), and display professional summaries and contact details.
 
-📦 Technologies & Tools Used
-**Python (Flask)**: Used to build the backend REST API and serve the web UI.
+🚀 Features
+📋 Add employee details with modular data handling
 
-**MySQL**: Stores all employee data in a structured table.
+🔍 Search employees using natural language queries
 
-**Postman**: Used for testing the API endpoints like /add, /search, and /summary.
+🤖 AI-generated summaries using selected LLMs
 
-**HTML (Jinja2 templates)**: Displays the frontend interface for searching and showing summaries.
+📇 Contact info display with summary
 
-**Google Gemini Pro API**: AI model that converts user queries into SQL and generates natural-language summaries of employees.
+🧠 Supports multiple AI models: Gemini, OpenAI, and DeepSeek
 
-🔁 How the System Works (Flow)
-Add Employee:
+🗃️ Modular MySQL database with normalized tables
 
-A user submits employee details (name, age, job info, etc.) via Postman or frontend.
+🛠️ Tech Stack
+Component	Tech
+Frontend UI	Streamlit
+Backend	Python, SQL, AI model integration
+AI Models	Gemini, OpenAI GPT, DeepSeek (placeholder)
+Database	MySQL with normalized schema
+ORM / Queries	Raw SQL using mysql-connector-python
 
-This data is saved into the employees table in MySQL using a POST API.
+🗃️ Database Schema
+The app uses a normalized relational schema. Key tables:
 
-Search Employee (AI SQL Generator):
+##sql
+Copy
+Edit
+CREATE TABLE employees (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    age INT,
+    sex VARCHAR(10),
+    married BOOLEAN
+);
 
-The user enters a natural language query like:
-"Find employees in Dallas"
+CREATE TABLE employee_contact (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    employee_id INT,
+    phone VARCHAR(20),
+    email VARCHAR(100),
+    location VARCHAR(100),
+    social_links TEXT,
+    FOREIGN KEY (employee_id) REFERENCES employees(id)
+);
 
-The query is sent to Gemini AI, which returns a raw SQL query:
-SELECT * FROM employees WHERE location LIKE '%Dallas%';
+CREATE TABLE employee_education (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    employee_id INT,
+    education TEXT,
+    FOREIGN KEY (employee_id) REFERENCES employees(id)
+);
 
-That SQL is executed in MySQL, and matching employee records are returned.
+CREATE TABLE employee_experience (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    employee_id INT,
+    experience TEXT,
+    FOREIGN KEY (employee_id) REFERENCES employees(id)
+);
 
-Generate AI Summary:
+CREATE TABLE employee_profile (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    employee_id INT,
+    about_self TEXT,
+    hobbies TEXT,
+    username VARCHAR(50),
+    password VARCHAR(255),
+    FOREIGN KEY (employee_id) REFERENCES employees(id)
+);
+📦 Project Structure
+bash
+Copy
+Edit
+employee_summary_app/
+│
+├── app.py                      # Streamlit UI app
+├── config.py                   # API keys & DB config
+│
+├── models/
+│   ├── __init__.py
+│   └── employee_model.py       # Insert/search logic
+│
+├── utils/
+│   ├── __init__.py
+│   ├── ai_helper.py            # Call Gemini/OpenAI/DeepSeek
+│   └── sql_generator.py        # Natural language → SQL
+│
+├── requirements.txt            # Dependencies
+└── README.md                   # You're here!
+#🔑 Config Setup
+Edit config.py:
 
-The selected employee record is sent to Gemini again.
+▶️ How to Run
+1. 📦 Install Requirements
+bash
+Copy
+Edit
+pip install -r requirements.txt
+2. 🛢️ Create MySQL Database
+sql
+Copy
+Edit
+CREATE DATABASE employee_ai;
+-- Then run the CREATE TABLE statements listed above
+3. 🧠 Add API Keys
+Update your config.py file with real API keys from:
 
-Gemini responds with a professional 3-paragraph summary based on their profile.
+https://ai.google.dev/ (Gemini)
 
-Contact Info:
+https://platform.openai.com/ (OpenAI)
 
-The user can click a "Contact" button (or use another endpoint) to view the employee’s email, phone, and LinkedIn.
+4. 🚀 Run the App
+bash
+Copy
+Edit
+streamlit run app.py
+#💬 Example Queries
+Try these natural queries in the UI:
+
+employees in Texas with MBA
+
+female employees from California
+
+who lives in Florida and has MSc degree
+
+
+📌 Notes
+DeepSeek integration is a placeholder unless their API is available.
+
+Ensure your MySQL user has full permissions to the employee_ai DB.
+
+Handle API rate limits and timeouts gracefully for large user loads.
+
+
+
+
+
+
+
+
