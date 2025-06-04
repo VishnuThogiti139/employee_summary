@@ -1,31 +1,45 @@
-from utils.db import get_db_connection
+from utils.db import get_connection
 
-def insert_employee(data):
-    conn = get_db_connection()
+def insert_employee(personal, contact, education, experience, profile):
+    conn = get_connection()
     cursor = conn.cursor()
-    sql = """INSERT INTO employees (
-        first_name, last_name, age, sex, married, location, phone, email,
-        education, social_links, about_self, experience, hobbies, username, password
-    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
 
-    values = tuple(data[k] for k in (
-        'first_name', 'last_name', 'age', 'sex', 'married', 'location', 'phone',
-        'email', 'education', 'social_links', 'about_self', 'experience',
-        'hobbies', 'username', 'password'
-    ))
+    cursor.execute("""
+        INSERT INTO employees (first_name, last_name, age, sex, married)
+        VALUES (%s, %s, %s, %s, %s)
+    """, personal)
+    emp_id = cursor.lastrowid
 
-    cursor.execute(sql, values)
+    cursor.execute("""
+        INSERT INTO employee_contact (employee_id, phone, email, location, social_links)
+        VALUES (%s, %s, %s, %s, %s)
+    """, (emp_id, *contact))
+
+    cursor.execute("""
+        INSERT INTO employee_education (employee_id, education)
+        VALUES (%s, %s)
+    """, (emp_id, education))
+
+    cursor.execute("""
+        INSERT INTO employee_experience (employee_id, experience)
+        VALUES (%s, %s)
+    """, (emp_id, experience))
+
+    cursor.execute("""
+        INSERT INTO employee_profile (employee_id, about_self, hobbies, username, password)
+        VALUES (%s, %s, %s, %s, %s)
+    """, (emp_id, *profile))
+
     conn.commit()
+    cursor.close()
     conn.close()
 
-def get_employees_by_query(query):
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute(query)
-        results = cursor.fetchall()
-        conn.close()
-        return results
-    except Exception as e:
-        print("❌ SQL Execution Error:", e)
-        return []
+
+def search_employees_by_sql(sql):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return results
