@@ -1,11 +1,12 @@
-import streamlit as st
-
-DB_CONFIG = {
-    "host": st.secrets["MYSQL_HOST"],
-    "port": int(st.secrets["MYSQL_PORT"]),        # ✅ use correct key for port
-    "user": st.secrets["MYSQL_USER"],
-    "password": st.secrets["MYSQL_PASSWORD"],
-    "database": st.secrets["MYSQL_DB"]
+API_KEYS = {
+    "Gemini": "GEMINI_API_KEY",
+    "OpenAI": "your_openai_api_key",
+    "DeepSeek": "Deepseek_API_KEY"
 }
 
-GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
+DB_CONFIG = {
+    "host": "MYSQL_HOST",
+    "user": "MYSQL_USER",
+    "password": "MYSQL_PASSWORD$",
+    "database": "MYSQL_DB"
+}
