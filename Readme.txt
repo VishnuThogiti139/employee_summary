@@ -1,33 +1,138 @@
-AI-Powered Employee Summary App
-A modular, extensible Streamlit-based web application to manage employee data, generate intelligent summaries using AI (Gemini, OpenAI, or DeepSeek), and display professional summaries and contact details.
+🧠 Employee AI Summary Generator
+A Dynamic, AI-Powered HR Assistant for Intelligent Employee Summaries
+Built with Streamlit | MySQL | LLMs (Gemini / OpenAI / DeepSeek)
+By Vishnu Thogiti
 
-🚀 Features
-📋 Add employee details with modular data handling
+📌 Overview
+The Employee AI Summary Generator is a full-stack Streamlit application that allows users to:
 
-🔍 Search employees using natural language queries
+Add new employee data through a dynamic form
 
-🤖 AI-generated summaries using selected LLMs
+Search employee records using natural language
 
-📇 Contact info display with summary
+Automatically generate a professional 3-paragraph summary of an employee using Large Language Models (LLMs)
 
-🧠 Supports multiple AI models: Gemini, OpenAI, and DeepSeek
+Display contact details only on demand for privacy
 
-🗃️ Modular MySQL database with normalized tables
+Works with any database schema (no hardcoded table or column names)
 
-🛠️ Tech Stack
-Component	Tech
-Frontend UI	Streamlit
-Backend	Python, SQL, AI model integration
-AI Models	Gemini, OpenAI GPT, DeepSeek (placeholder)
-Database	MySQL with normalized schema
-ORM / Queries	Raw SQL using mysql-connector-python
+🎯 Key Features
+Feature	Description
+🔍 Natural Language Search	Uses LLMs to convert human questions to SQL
+🧠 AI-Generated Summaries	Summarizes employee profile into clean, professional text
+🔐 Contact Privacy	Contact info shown only after user clicks “Show Contact”
+📊 Dynamic Schema Handling	Adapts to any MySQL schema using SHOW TABLES and DESCRIBE
+🔁 Multi-Model LLM Support	Gemini (working), OpenAI, and DeepSeek pluggable
+🧱 Modular Code Design	Clean separation into models, utils, and api folders
+🧪 Prompt Engineering	Safe, structured AI prompts without leaking private data
 
-🗃️ Database Schema
-The app uses a normalized relational schema. Key tables:
+🖼️ UI Screens (Optional)
+<details> <summary>Click to Expand</summary>
+Add Employee via Sidebar
 
+Natural Language Search Bar
+
+Model Selector (Gemini/OpenAI/DeepSeek)
+
+Summary Output Section
+
+Contact Info Section (hidden until button click)
+
+</details>
+🧰 Tech Stack
+Frontend/UI: Streamlit
+
+Backend: Python, MySQL
+
+AI/LLM APIs: Gemini (working), OpenAI (optional), DeepSeek (optional)
+
+Database Interaction: MySQL Connector
+
+LLM Prompting: Prompt engineering modules for summary + SQL generation
+
+EMPLOYEE_SUMMARY-MAIN/
+├── __pycache__/
+├── _chroma_store/
+├── libs/
+│   ├── models/
+│   │   ├── __pycache__/
+│   │   └── employee_model.py
+│   ├── routes/
+│   │   ├── add_employee.py
+│   │   ├── ai_summary.py
+│   │   ├── dv/
+│   │   └── get_employee.py
+│   └── utils/
+│       ├── __pycache__/
+│       ├── ai_helper.py
+│       ├── db.py
+│       ├── extract_schema.py
+│       ├── sql_generator.py
+│       └── vector_store.py
+├── .env
+├── app.py
+├── config.py
+├── Need_to_change.txt
+├── Readme.txt
+└── requirements.txt
+
+🚀 How to Run Locally
+
+✅ Prerequisites
+Python 3.9+
+
+MySQL Server running locally with correct schema
+
+Gemini API Key (or replace with your own LLM)
+
+📦 Setup
+
+git clone https://github.com/your-username/employee-ai-summary.git
+cd employee-ai-summary
+
+# Create a virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+🔑 Add your Gemini API Key
+In utils/ai_helper.py, insert your Gemini key:
+
+
+genai.configure(api_key="YOUR_GEMINI_API_KEY")
+
+▶️ Run the App
+
+streamlit run app.py
+
+🔮 Future Extensions
+
+ Add CSV bulk upload
+
+ Enable feedback-based AI prompt refinement
+
+ Secure deployment (Streamlit Cloud + GCP/AWS MySQL)
+
+ RAG-based resume/doc parsing
+
+ PDF/Word summary exports
+
+ Role-based authentication (HR/Admin/Guest)
+
+ Integration into Microsoft Power Platform (for enterprise use)
+
+🙏 Acknowledgments
+Special thanks to:
+
+Gemini API for fast AI-powered responses
+
+Streamlit for rapid UI building
+
+MySQL for relational data modeling
 ##sql
-Copy
-Edit
+
 CREATE TABLE employees (
     id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(50),
@@ -70,74 +175,3 @@ CREATE TABLE employee_profile (
     password VARCHAR(255),
     FOREIGN KEY (employee_id) REFERENCES employees(id)
 );
-📦 Project Structure
-bash
-Copy
-Edit
-employee_summary_app/
-│
-├── app.py                      # Streamlit UI app
-├── config.py                   # API keys & DB config
-│
-├── models/
-│   ├── __init__.py
-│   └── employee_model.py       # Insert/search logic
-│
-├── utils/
-│   ├── __init__.py
-│   ├── ai_helper.py            # Call Gemini/OpenAI/DeepSeek
-│   └── sql_generator.py        # Natural language → SQL
-│
-├── requirements.txt            # Dependencies
-└── README.md                   # You're here!
-#🔑 Config Setup
-Edit config.py:
-
-▶️ How to Run
-1. 📦 Install Requirements
-bash
-Copy
-Edit
-pip install -r requirements.txt
-2. 🛢️ Create MySQL Database
-sql
-Copy
-Edit
-CREATE DATABASE employee_ai;
--- Then run the CREATE TABLE statements listed above
-3. 🧠 Add API Keys
-Update your config.py file with real API keys from:
-
-https://ai.google.dev/ (Gemini)
-
-https://platform.openai.com/ (OpenAI)
-
-4. 🚀 Run the App
-bash
-Copy
-Edit
-streamlit run app.py
-#💬 Example Queries
-Try these natural queries in the UI:
-
-employees in Texas with MBA
-
-female employees from California
-
-who lives in Florida and has MSc degree
-
-
-📌 Notes
-DeepSeek integration is a placeholder unless their API is available.
-
-Ensure your MySQL user has full permissions to the employee_ai DB.
-
-Handle API rate limits and timeouts gracefully for large user loads.
-
-
-
-
-
-
-
-
