@@ -2,6 +2,12 @@ streamlit
 mysql-connector-python
 openai
 google-generativeai
+python-dotenv
+pyspark
+chromadb
 langchain
 langchain-google-genai
-
+sentence-transformers
+tf-keras.pip 
+faiss-cpu
+numpy
