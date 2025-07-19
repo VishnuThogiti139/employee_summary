@@ -128,7 +128,7 @@ if st.session_state.search_triggered and st.session_state.employee_options:
         {emp_data_str}
         DO NOT include ID, contact details or sensitive information in the summary.
         highlight name, skills, education, experience, and personality strengths.
-        remaining useful information.
+        remaining useful information and always represent them by there first_name.
         Make it sound confident and workplace-ready.
         """
         try:
