@@ -1,53 +1,72 @@
+import re
+import numpy as np
+from sentence_transformers import SentenceTransformer
+import faiss
 from utils.extract_schema import get_clean_schema_string
-from config import API_KEYS
-import openai
-import google.generativeai as genai
+
+# Load embedding model
+model = SentenceTransformer('all-MiniLM-L6-v2')
+
+def embed_chunks(schema_text, chunk_size=300):
+    """
+    Splits schema text into chunks and embeds them into a FAISS index.
+    """
+    chunks = []
+    current_chunk = ""
+    
+    for line in schema_text.splitlines():
+        if len(current_chunk) + len(line) > chunk_size:
+            chunks.append(current_chunk.strip())
+            current_chunk = ""
+        current_chunk += line + "\n"
+    if current_chunk.strip():
+        chunks.append(current_chunk.strip())
+
+    vectors = model.encode(chunks)
+    index = faiss.IndexFlatL2(vectors.shape[1])
+    index.add(np.array(vectors))
+    return index, vectors, chunks
 
 def generate_sql_prompt(user_prompt):
-    schema_text = get_clean_schema_string()  # Retrieve schema as string
+    """
+    Builds a prompt for the LLM by retrieving the most relevant schema chunks.
+    """
+    schema = get_clean_schema_string()
+    index, vectors, chunks = embed_chunks(schema)
+    prompt_vec = model.encode([user_prompt])[0]
 
-    if not schema_text:
-        return "Error: Schema is missing or invalid."
+    D, I = index.search(np.array([prompt_vec]), k=3)
+    context = "\n\n".join([chunks[i] for i in I[0]])
 
-    # Generate prompt for the AI model
-    return f"""
-    You are a SQL assistant that can dynamically generate SQL queries.
+    return f"""You are a professional SQL generator.
 
-    Here is the schema of the database:
-    {schema_text}
+Using the following database schema context, write a valid MySQL SELECT 
+query for the user's request.
 
-    Based on the schema above, generate a SQL query that answers the 
-    following user request:
-    {user_prompt}
+### Schema:
+{context}
+
+Based on the schema context above, generate a SQL query that answers the 
+following user request:
+### User Request:
+{user_prompt}
+
 
     Include necessary JOINs based on the relationships between 
     tables and return all relevant fields. 
     Only return the SQL query, no markdown, no explanations.
+### SQL:"""
+
+def clean_sql_query(raw_sql):
     """
+    Cleans the AI-generated SQL query by removing markdown or commentary.
+    """
+    # Remove code block markdown (```sql ... ```)
+    cleaned = re.sub(r"```sql|```", "", raw_sql, flags=re.IGNORECASE).strip()
 
-def call_ai(model_name, prompt):
-    try:
-        if model_name.lower() == "gemini":
-            genai.configure(api_key=API_KEYS["Gemini"])
-            return genai.GenerativeModel("gemini-1.5-flash").generate_content(prompt).text
-        elif model_name.lower() == "openai":
-            openai.api_key = API_KEYS["OpenAI"]
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=[{"role": "user", "content": prompt}]
-            )
-            return response.choices[0].message.content
-        
-        return "[Unsupported model]"
+    # Extract actual SELECT statement (safeguard)
+    match = re.search(r"(SELECT .*?;)", cleaned, re.IGNORECASE | re.DOTALL)
+    if match:
+        return match.group(1).strip()
 
-    except Exception as e:
-        return f"Error occurred with {model_name}: {str(e)}"
-
-def clean_sql_query(sql_text: str) -> str:
-    # """
-    # Clean up the SQL query to remove 
-    # unwanted characters or markdown.
-    # """
-    sql_text = sql_text.strip()
-    sql_text = sql_text.replace("```sql", "").replace("```", "").strip()  # Remove any code block markers
-    return sql_text
+    return cleaned
