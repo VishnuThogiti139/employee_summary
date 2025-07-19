@@ -9,7 +9,7 @@ def get_db_schema():
                 
                 schema = []
                 for table in tables:
-                    columns = get_table_schema(cursor, table)  # Get schema for each table
+                    columns = get_table_schema(cursor, table)
                     col_info = ", ".join(f"{col[0]} ({col[1]})" for col in columns)
                     schema.append(f"Table: {table}\nColumns: {col_info}")
                 
@@ -23,12 +23,5 @@ def get_table_schema(cursor, table):
     return cursor.fetchall()
 
 def get_clean_schema_string():
-    # """
-    # Fetches and returns the database schema as a formatted string.
-    # This function will return the schema of the tables in the database
-    # with proper formatting for use in the SQL prompt.
-    # """
-    schema_lines = get_db_schema()  # Use the existing get_db_schema function
-    schema_string = "\n".join(schema_lines)  # Join all schema lines into a single string
-    
-    return schema_string
+    schema_lines = get_db_schema()
+    return "\n".join(schema_lines)
